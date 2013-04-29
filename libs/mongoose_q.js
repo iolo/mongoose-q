@@ -55,11 +55,13 @@ function mongooseQ(mongoose, options) {
   var mongoose = mongoose || require('mongoose');
   var prefix = options && options.prefix || '';
   var suffix = options && options.suffix || 'Q';
+  if (mongoose['__q_applied_' + prefix + suffix]) { return mongoose; }
 
   qualify(mongoose.Model, MONGOOSE_MODEL_STATICS, prefix, suffix);
   qualify(mongoose.Model.prototype, MONGOOSE_MODEL_METHODS, prefix, suffix);
   qualify(mongoose.Query.prototype, MONGOOSE_QUERY_METHODS, prefix, suffix);
 
+  mongoose['__q_applied_' + prefix + suffix] = true;
   return mongoose;
 }
 
