@@ -2,7 +2,10 @@
 
 var
   fixtures = require('./fixtures'),
-  mongoose = require('../libs/mongoose_q')(require('mongoose')),
+  customMapper = function (name) {
+    return 'q' + name.charAt(0).toUpperCase() + name.substring(1);
+  },
+  mongoose = require('../libs/mongoose_q')(require('mongoose'), {spread: true, mapper: customMapper}),
   Schema = mongoose.Schema,
   UserSchema = new Schema({
     name: String
@@ -50,7 +53,7 @@ module.exports = {
   test_modelStatics: function (test) {
     MONGOOSE_MODEL_STATICS.forEach(function (funcName) {
       console.log(funcName);
-      test.equal(typeof UserModel[funcName + 'Q'], 'function');
+      test.equal(typeof UserModel[customMapper(funcName)], 'function');
     });
     test.done();
   },
@@ -58,7 +61,7 @@ module.exports = {
     var model = new UserModel();
     MONGOOSE_MODEL_METHODS.forEach(function (funcName) {
       console.log(funcName);
-      test.equal(typeof model[funcName + 'Q'], 'function');
+      test.equal(typeof model[customMapper(funcName)], 'function');
     });
     test.done();
   },
@@ -66,16 +69,16 @@ module.exports = {
     var query = UserModel.find();
     MONGOOSE_QUERY_METHODS.forEach(function (funcName) {
       console.log(funcName);
-      test.equal(typeof query[funcName + 'Q'], 'function');
+      test.equal(typeof query[customMapper(funcName)], 'function');
     });
     test.done();
   },
   test_findById__and__populate: function (test) {
-    PostModel.findByIdQ(fixtures.posts.p1._id)
+    PostModel.qFindById(fixtures.posts.p1._id)
       .then(function (result) {
         console.log('Model.findById-->', result);
         test.ok(result);
-        return result.populateQ('author');
+        return result.qPopulate('author');
       })
       .then(function (result) {
         console.log('Model#populate-->', result);
@@ -85,10 +88,20 @@ module.exports = {
       .done(test.done);
   },
   test_findById__and__exec: function (test) {
-    PostModel.findById(fixtures.posts.p1._id).execQ()
+    PostModel.findById(fixtures.posts.p1._id).qExec()
       .then(function (result) {
         console.log('Model.findById and Query#exec-->', result);
         test.ok(result);
+      })
+      .fail(test.ifError)
+      .done(test.done);
+  },
+  test_update_spread: function (test) {
+    PostModel.qUpdate({_id: fixtures.posts.p1._id}, { title: 'changed'})
+      .spread(function (affectedRows, raw) {
+        console.log('Model.update-->', arguments);
+        test.equal(affectedRows, 1);
+        test.ok(raw);
       })
       .fail(test.ifError)
       .done(test.done);

@@ -24,20 +24,49 @@ var
   apslice = Array.prototype.slice;
 
 /**
- *
- * @param obj
- * @param funcNames
- * @param prefix
- * @param suffix
+ * @module mongooseq
  */
-function qualify(obj, funcNames, prefix, suffix) {
+;
+
+/**
+ * @callback MapperCallback
+ * @param {string} name the original function name to apply Q
+ * @returns {string} Q-applied function name
+ */
+;
+
+/**
+ * @typedef {object} Options
+ * @property {string} prefix
+ * @property {string} suffix
+ * @property {MapperCallback} mapper
+ * @property {boolean} spread
+ */
+;
+
+/**
+ *
+ * @param {object} obj
+ * @param {Array.<string>} funcNames - original function names to apply Q
+ * @param {MapperCallback} funcNameMapper maps a function name into Q-applied one
+ * @param {boolean} [spread=false] use spread for multi-results
+ */
+function qualify(obj, funcNames, funcNameMapper, spread) {
   funcNames.forEach(function (funcName) {
     var func = obj[funcName];
     if (typeof(func) !== 'function') return;
-    obj[prefix + funcName + suffix] = function () {
+    obj[funcNameMapper(funcName)] = function () {
       var d = Q.defer();
       var args = apslice.call(arguments);
-      args.push(d.makeNodeResolver());
+      args.push(function (err, result) {
+        if (err) {
+          return d.reject(err);
+        }
+        if (spread && arguments.length > 2) {
+          return d.resolve(apslice.call(arguments, 1));
+        }
+        return d.resolve(result);
+      });
       func.apply(this, args);
       return d.promise;
     };
@@ -48,20 +77,28 @@ function qualify(obj, funcNames, prefix, suffix) {
  * add Q wrappers for static/instance functions of mongoose model and query.
  *
  * @param {mongoose.Mongoose} [mongoose]
- * @param {Object} [options] prefix and/or suffix for wrappers
+ * @param {Options} [options] prefix and/or suffix for wrappers
  * @returns {mongoose.Mongoose} the same mongoose instance, for convenince
  */
 function mongooseQ(mongoose, options) {
   var mongoose = mongoose || require('mongoose');
   var prefix = options && options.prefix || '';
   var suffix = options && options.suffix || 'Q';
-  if (mongoose['__q_applied_' + prefix + suffix]) { return mongoose; }
+  var mapper = options && options.mapper || function (funcName) {
+    return prefix + funcName + suffix;
+  };
+  var spread = options && options.spread;
+  // avoid duplicated application for custom mapper function...
+  var applied = require('crypto').createHash('md5').update(mapper.toString()).digest('hex');
+  if (mongoose['__q_applied_' + applied]) {
+    return mongoose;
+  }
 
-  qualify(mongoose.Model, MONGOOSE_MODEL_STATICS, prefix, suffix);
-  qualify(mongoose.Model.prototype, MONGOOSE_MODEL_METHODS, prefix, suffix);
-  qualify(mongoose.Query.prototype, MONGOOSE_QUERY_METHODS, prefix, suffix);
+  qualify(mongoose.Model, MONGOOSE_MODEL_STATICS, mapper, spread);
+  qualify(mongoose.Model.prototype, MONGOOSE_MODEL_METHODS, mapper, spread);
+  qualify(mongoose.Query.prototype, MONGOOSE_QUERY_METHODS, mapper, spread);
 
-  mongoose['__q_applied_' + prefix + suffix] = true;
+  mongoose['__q_applied_' + applied] = true;
   return mongoose;
 }
 

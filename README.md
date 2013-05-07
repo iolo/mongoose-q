@@ -45,9 +45,30 @@ SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...).exec
 
 to apply Q with custom suffix/prefix:
 ```javascript
-var mongoose = require('mongoose-q')(require('mongoose'), {prefix:'promoseOf', suffix:'withQ'});
+var mongoose = require('mongoose-q')(require('mongoose'), {prefix:'promoseOf_', suffix:'_withQ'});
 SomeModel.promiseOf_findAndUpdate_withQ(...)
   .then(function (result) { ... })
+  .fail(function (err) { ... })
+  .done();
+```
+
+to apply Q with custom name mapper:
+```javascript
+function customMapper(name) {
+  return 'q' + name.charAt(0).toUpperCase() + name.substring(1);
+}
+var mongoose = require('mongoose-q')(require('mongoose'), {mapper:customMapper});
+SomeModel.qFindAndUpdate(...)
+  .then(function (result) { ... })
+  .fail(function (err) { ... })
+  .done();
+```
+
+to apply Q with auto ```spread```:
+```javascript
+var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
+SomeModel.updateQ(...)
+  .spread(function (affectedRows, raw) { ... })
   .fail(function (err) { ... })
   .done();
 ```
