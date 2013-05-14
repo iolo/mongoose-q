@@ -29,32 +29,18 @@ var
 ;
 
 /**
- * @callback MapperCallback
- * @param {string} name the original function name to apply Q
- * @returns {string} Q-applied function name
- */
-;
-
-/**
- * @typedef {object} Options
- * @property {string} prefix
- * @property {string} suffix
- * @property {MapperCallback} mapper
- * @property {boolean} spread
- */
-;
-
-/**
  *
  * @param {object} obj
  * @param {Array.<string>} funcNames - original function names to apply Q
- * @param {MapperCallback} funcNameMapper maps a function name into Q-applied one
- * @param {boolean} [spread=false] use spread for multi-results
+ * @param {function(string):string} funcNameMapper maps a function name into Q-applied one
+ * @param {*} [spread=false] use spread for multi-results
  */
 function qualify(obj, funcNames, funcNameMapper, spread) {
   funcNames.forEach(function (funcName) {
-    var func = obj[funcName];
-    if (typeof(func) !== 'function') return;
+    if (typeof(obj[funcName]) !== 'function') {
+      console.warn('***skip*** function not found:', funcName);
+      return;
+    }
     obj[funcNameMapper(funcName)] = function () {
       var d = Q.defer();
       var args = apslice.call(arguments);
@@ -62,12 +48,16 @@ function qualify(obj, funcNames, funcNameMapper, spread) {
         if (err) {
           return d.reject(err);
         }
+        // with 'spread' option: returns 'all' result with 'spread' only for multiple result
         if (spread && arguments.length > 2) {
           return d.resolve(apslice.call(arguments, 1));
         }
+        // without 'spread' option: returns the 'first' result only and ignores following result
         return d.resolve(result);
       });
-      func.apply(this, args);
+      // fix https://github.com/iolo/mongoose-q/issues/1
+      // mongoose patches some instance methods after instantiation. :(
+      this[funcName].apply(this, args);
       return d.promise;
     };
   });
@@ -77,17 +67,22 @@ function qualify(obj, funcNames, funcNameMapper, spread) {
  * add Q wrappers for static/instance functions of mongoose model and query.
  *
  * @param {mongoose.Mongoose} [mongoose]
- * @param {Options} [options] prefix and/or suffix for wrappers
+ * @param {object.<string,*>} [options={}] - prefix and/or suffix for wrappers
+ * @param {string} [options.prefix='']
+ * @param {string} [options.suffix='']
+ * @param {function(string):string} [options.mapper]
+ * @param {boolean} [options.spread=false]
  * @returns {mongoose.Mongoose} the same mongoose instance, for convenince
  */
 function mongooseQ(mongoose, options) {
   var mongoose = mongoose || require('mongoose');
-  var prefix = options && options.prefix || '';
-  var suffix = options && options.suffix || 'Q';
-  var mapper = options && options.mapper || function (funcName) {
+  options = options || {};
+  var prefix = options.prefix || '';
+  var suffix = options.suffix || 'Q';
+  var mapper = options.mapper || function (funcName) {
     return prefix + funcName + suffix;
   };
-  var spread = options && options.spread;
+  var spread = options.spread;
   // avoid duplicated application for custom mapper function...
   var applied = require('crypto').createHash('md5').update(mapper.toString()).digest('hex');
   if (mongoose['__q_applied_' + applied]) {
