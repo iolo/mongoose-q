@@ -11,7 +11,8 @@ usage
 ```javascript
 var mongoose = require('mongoose-q')(require('mongoose'));
 // verbose way: mongooseQ is unused
-var mongoose = require('mongoose'), mongooseQ = require('mongoose-q')(mongoose)
+var mongoose = require('mongoose'),
+    mongooseQ = require('mongoose-q')(mongoose)
 // shortest way: mongoose will be loaded by mongoose-q
 var mongoose = require('mongoose-q')();
 ```
@@ -38,7 +39,8 @@ someModel.populateQ()
 * use Q-applied query methods:
 
 ```javascript
-SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...).execQ() // no 'Q' suffix for model statics
+SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...)
+  .execQ() // no 'Q' suffix for model statics except for execQ()
   .then(function (result) { ... })
   .fail(function (err) { ... })
   .done();
@@ -47,7 +49,7 @@ SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...).exec
 * to apply Q with custom suffix/prefix:
 
 ```javascript
-var mongoose = require('mongoose-q')(require('mongoose'), {prefix:'promoseOf_', suffix:'_withQ'});
+var mongoose = require('mongoose-q')(require('mongoose'), {prefix:'promiseOf_', suffix:'_withQ'});
 SomeModel.promiseOf_findAndUpdate_withQ(...)
   .then(function (result) { ... })
   .fail(function (err) { ... })
