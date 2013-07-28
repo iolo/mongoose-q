@@ -156,5 +156,22 @@ module.exports = {
       })
       .fail(test.ifError)
       .done(test.done);
+  },
+  test_issue2: function (test) {
+    UserModel.qFindById(fixtures.users.u1._id)
+      .then(function (user) {
+        return [ user, PostModel.find().populate('author').qExec() ];
+      })
+      .spread(function (user, users) {
+        console.log('user:', user);
+        console.log('users:', users);
+        test.ok(user);
+        test.ok(users);
+      })
+      .fail(function (err) {
+        console.log(err);
+        test.ifError(err);
+      })
+      .done(test.done);
   }
 };
