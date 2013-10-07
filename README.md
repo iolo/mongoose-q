@@ -3,6 +3,8 @@ mongoose-q
 
 [kriskowal's Q](http://documentup.com/kriskowal/q/) support for [mongoose](http://mongoosejs.com).
 
+for [mongodb native nodejs driver](http://mongodb.github.io/node-mongodb-native/), see [mongo-q](http://github.com/iolo/mongo-q).
+
 usage
 -----
 
