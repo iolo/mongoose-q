@@ -14,7 +14,7 @@ var
     // mongoose.Model instance
     'save', 'remove',
     // mongoose.Document instance
-    'populate'
+    'populate', 'update'
   ],
   MONGOOSE_QUERY_METHODS = [
     // mongoose.Query instance
