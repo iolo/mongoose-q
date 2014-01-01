@@ -1,6 +1,6 @@
 {
   "name": "mongoose-q",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "kriskowal's Q support for mongoose",
   "author": "Dongsu Jang <iolothebard@gmail.com>",
   "repository": {
@@ -16,11 +16,11 @@
     "mongoose": "~3.8.3"
   },
   "devDependencies": {
-    "nodeunit": "*",
-    "pow-mongodb-fixtures": "~0.8.1",
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "*",
-    "grunt-contrib-nodeunit": "*"
+    "nodeunit": "latest",
+    "pow-mongodb-fixtures": "latest",
+    "grunt": "latest",
+    "grunt-contrib-jshint": "latest",
+    "grunt-contrib-nodeunit": "latest"
   },
   "directories": {
     "lib": "./lib"

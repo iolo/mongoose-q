@@ -7,6 +7,7 @@ var
     'remove', 'ensureIndexes', 'find', 'findById', 'findOne', 'count', 'distinct',
     'findOneAndUpdate', 'findByIdAndUpdate', 'findOneAndRemove', 'findByIdAndRemove',
     'create', 'update', 'mapReduce', 'aggregate', 'populate',
+    'geoNear', 'geoSearch',
     // mongoose.Document static
     'update'
   ],
@@ -26,7 +27,6 @@ var
 /**
  * @module mongooseq
  */
-;
 
 /**
  *
@@ -75,7 +75,7 @@ function qualify(obj, funcNames, funcNameMapper, spread) {
  * @returns {mongoose.Mongoose} the same mongoose instance, for convenince
  */
 function mongooseQ(mongoose, options) {
-  var mongoose = mongoose || require('mongoose');
+  mongoose = mongoose || require('mongoose');
   options = options || {};
   var prefix = options.prefix || '';
   var suffix = options.suffix || 'Q';
