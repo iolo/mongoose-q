@@ -22,7 +22,11 @@ var
     'find', 'exec', 'findOne', 'count', 'distinct', 'update', 'remove',
     'findOneAndUpdate', 'findOneAndRemove'
   ],
-  apslice = Array.prototype.slice;
+  //MONGOOSE_AGGREGATE_METHODS = [
+  //  'exec'
+  //],
+  apslice = Array.prototype.slice,
+  DEBUG = !!process.env.MONGOOSEQ_DEBUG;
 
 /**
  * @module mongooseq
@@ -36,12 +40,15 @@ var
  * @param {*} [spread=false] use spread for multi-results
  */
 function qualify(obj, funcNames, funcNameMapper, spread) {
+  DEBUG && console.log('wrap obj:', obj);
   funcNames.forEach(function (funcName) {
     if (typeof(obj[funcName]) !== 'function') {
-      console.warn('***skip*** function not found:', funcName);
+      DEBUG && console.warn('***skip*** function not found:', funcName);
       return;
     }
-    obj[funcNameMapper(funcName)] = function () {
+    var mappedFuncName = funcNameMapper(funcName);
+    DEBUG && console.log('wrap function:', funcName, '-->', mappedFuncName);
+    obj[mappedFuncName] = function () {
       var d = Q.defer();
       var args = apslice.call(arguments);
       args.push(function (err, result) {
@@ -92,6 +99,8 @@ function mongooseQ(mongoose, options) {
   qualify(mongoose.Model, MONGOOSE_MODEL_STATICS, mapper, spread);
   qualify(mongoose.Model.prototype, MONGOOSE_MODEL_METHODS, mapper, spread);
   qualify(mongoose.Query.prototype, MONGOOSE_QUERY_METHODS, mapper, spread);
+
+  //qualify(Aggregate.prototype, AGGREGATE_METHODS, mapper, spread);
 
   mongoose['__q_applied_' + applied] = true;
   return mongoose;
