@@ -19,7 +19,7 @@ var mongoose = require('mongoose'),
 var mongoose = require('mongoose-q')();
 ```
 
-* use Q-applied model statics:
+* use Q-applied `model` statics:
 
 ```javascript
 SomeModel.findByIdQ(....blahblah...)
@@ -28,7 +28,7 @@ SomeModel.findByIdQ(....blahblah...)
   .done();
 ```
 
-* use Q-applied model methods:
+* use Q-applied `model` methods:
 
 ```javascript
 var someModel = new SomeModel(...);
@@ -38,7 +38,7 @@ someModel.populateQ()
   .done();
 ```
 
-* use Q-applied query methods:
+* use Q-applied `query` methods:
 
 ```javascript
 SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...)
@@ -48,7 +48,7 @@ SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...)
   .done();
 ```
 
-* to apply Q with custom suffix/prefix:
+* to apply Q with custom `suffix`/`prefix`:
 
 ```javascript
 var mongoose = require('mongoose-q')(require('mongoose'), {prefix:'promiseOf_', suffix:'_withQ'});
@@ -58,7 +58,7 @@ SomeModel.promiseOf_findAndUpdate_withQ(...)
   .done();
 ```
 
-* to apply Q with custom name mapper:
+* to apply Q with custom name `mapper`:
 
 ```javascript
 function customMapper(name) {
@@ -71,7 +71,7 @@ SomeModel.qFindAndUpdate(...)
   .done();
 ```
 
-* to apply Q with ```spread```:
+* to apply Q with `spread`:
 
 ```javascript
 var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
@@ -96,8 +96,20 @@ model.saveQ()
   .fail(function (err) { ... })
   .done();
 ```
+> NOTE: without `spread` option(by default), you can access only the first result with `then`!!
 
-> NOTE: without ```spread``` option(by default), you can access only the first result with ```then```!!
+* to define custom statics/instance methods using Q
+
+```javascript
+SomeSchema.statics.findByName = function (name) {
+  return this.findQ({name: name}); // NOTE: returns Promise object.
+};
+...
+var SomeModel = mongoose.model('Some', SomeSchema);
+SomeModel.findByName('foo').then(function(result) {
+  console.log(result);
+});
+```
+> NOTE: this is not a feature of mongoose-q
 
 That's all folks!
-
