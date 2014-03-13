@@ -20,7 +20,7 @@ var
   MONGOOSE_QUERY_METHODS = [
     // mongoose.Query instance
     'find', 'exec', 'findOne', 'count', 'distinct', 'update', 'remove',
-    'findOneAndUpdate', 'findOneAndRemove'
+    'findOneAndUpdate', 'findOneAndRemove', 'lean', 'limit', 'skip', 'sort'
   ],
   //MONGOOSE_AGGREGATE_METHODS = [
   //  'exec'
