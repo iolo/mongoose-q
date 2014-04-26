@@ -113,6 +113,33 @@ module.exports = {
       .fail(test.ifError)
       .done(test.done);
   },
+  test_create: function (test) {
+    UserModel.qCreate({name:'hello'}, {name:'world'})
+      .then(function (createdUsers) {
+        console.log('created users:', arguments);
+        test.equal(createdUsers.length, 2);
+        test.equal(createdUsers[0].name, 'hello');
+        test.equal(createdUsers[1].name, 'world');
+      })
+      .fail(function (err) {
+        console.log(err);
+        test.ifError(err);
+      })
+      .done(test.done);
+  },
+  test_create_spread: function (test) {
+    UserModel.qCreate({name:'hello spread'}, {name:'world spread'})
+      .spread(function (createdUser1, createdUser2) {
+        console.log('created users:', arguments);
+        test.equal(createdUser1.name, 'hello spread');
+        test.equal(createdUser2.name, 'world spread');
+      })
+      .fail(function (err) {
+        console.log(err);
+        test.ifError(err);
+      })
+      .done(test.done);
+  },
   test_update_spread: function (test) {
     PostSchema.__test = test;
     PostModel.qUpdate({_id: fixtures.posts.p1._id}, { title: 'changed'})
