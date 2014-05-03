@@ -1,6 +1,6 @@
 {
   "name": "mongoose-q",
-  "version": "0.0.10",
+  "version": "0.0.20",
   "description": "kriskowal's Q support for mongoose",
   "author": "Dongsu Jang <iolothebard@gmail.com>",
   "repository": {
@@ -12,7 +12,7 @@
     "node": "~0.10"
   },
   "dependencies": {
-    "q": "~1.0.0",
+    "q": "~2.0.0",
     "mongoose": "~3.8.3"
   },
   "devDependencies": {

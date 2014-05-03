@@ -100,7 +100,7 @@ module.exports = {
         console.log('Model#populate-->', result);
         test.ok(result);
       })
-      .fail(test.ifError)
+      .catch(test.ifError)
       .done(test.done);
   },
   test_findById__and__exec: function (test) {
@@ -110,7 +110,7 @@ module.exports = {
         console.log('Model.findById and Query#exec-->', result);
         test.ok(result);
       })
-      .fail(test.ifError)
+      .catch(test.ifError)
       .done(test.done);
   },
   test_create: function (test) {
@@ -121,7 +121,7 @@ module.exports = {
         test.equal(createdUsers[0].name, 'hello');
         test.equal(createdUsers[1].name, 'world');
       })
-      .fail(function (err) {
+      .catch(function (err) {
         console.log(err);
         test.ifError(err);
       })
@@ -134,7 +134,7 @@ module.exports = {
         test.equal(createdUser1.name, 'hello spread');
         test.equal(createdUser2.name, 'world spread');
       })
-      .fail(function (err) {
+      .catch(function (err) {
         console.log(err);
         test.ifError(err);
       })
@@ -148,7 +148,7 @@ module.exports = {
         test.equal(affectedRows, 1);
         test.ok(raw);
       })
-      .fail(test.ifError)
+      .catch(test.ifError)
       .done(test.done);
   },
   test_save: function (test) {
@@ -181,7 +181,7 @@ module.exports = {
         test.equal(result.title, 'new-title');
         test.equal(result.author.toString(), fixtures.users.u1._id.toString());
       })
-      .fail(test.ifError)
+      .catch(test.ifError)
       .done(test.done);
   },
   test_issue2: function (test) {
@@ -195,7 +195,7 @@ module.exports = {
         test.ok(user);
         test.ok(users);
       })
-      .fail(function (err) {
+      .catch(function (err) {
         console.log(err);
         test.ifError(err);
       })
