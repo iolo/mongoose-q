@@ -5,6 +5,8 @@ mongoose-q
 
 for [mongodb native nodejs driver](http://mongodb.github.io/node-mongodb-native/), see [mongo-q](http://github.com/iolo/mongo-q).
 
+**NOTE: this is branch for Q 2.0.0+! checkout master for Q 1.0.x ;)**
+
 usage
 -----
 
