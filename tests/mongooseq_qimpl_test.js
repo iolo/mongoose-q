@@ -4,7 +4,7 @@ var customMapper = function (name) {
 };
 
 var commonTests = require('./common_tests', customMapper);
-var QProvider = require('../lib/promise_providers/q_provider');
+var QProvider = require('../lib/promise_providers/q');
 var mongoose = require('mongoose');
 var mongooseQ = require('../lib')(mongoose, {
     spread: true,
