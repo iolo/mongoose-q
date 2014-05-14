@@ -25,7 +25,7 @@
     "when": "^3.1.0"
   },
   "directories": {
-    "lib": "./lib"
+    "lib": "./libs"
   },
-  "main": "./lib/mongoose_q"
+  "main": "./libs/mongoose_q"
 }
