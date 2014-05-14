@@ -2,6 +2,7 @@
 
 var
   Q = require('q'),
+  QPromiseProvider = require('./promise_providers/q_provider'),
   MONGOOSE_MODEL_STATICS = [
     // mongoose.Model static
     'remove', 'ensureIndexes', 'find', 'findById', 'findOne', 'count', 'distinct',
@@ -27,20 +28,16 @@ var
   //],
   apslice = Array.prototype.slice,
   DEBUG = !!process.env.MONGOOSEQ_DEBUG;
-
-/**
- * @module mongooseq
- */
-
+  
 /**
  *
  * @param {object} obj
  * @param {Array.<string>} funcNames - original function names to apply Q
  * @param {function(string):string} funcNameMapper maps a function name into Q-applied one
  * @param {*} [spread=false] use spread for multi-results
+ * @param {*} [promiseProvider=Q] The promise provider to use
  */
-function qualify(obj, funcNames, funcNameMapper, spread) {
-  DEBUG && console.log('wrap obj:', obj);
+function qualify(obj, funcNames, funcNameMapper, spread, promiseProvider) {
   funcNames.forEach(function (funcName) {
     if (typeof(obj[funcName]) !== 'function') {
       DEBUG && console.warn('***skip*** function not found:', funcName);
@@ -48,24 +45,26 @@ function qualify(obj, funcNames, funcNameMapper, spread) {
     }
     var mappedFuncName = funcNameMapper(funcName);
     DEBUG && console.log('wrap function:', funcName, '-->', mappedFuncName);
-    obj[mappedFuncName] = function () {
-      var d = Q.defer();
+    obj[mappedFuncName] = function() {
+      var that = this;
       var args = apslice.call(arguments);
-      args.push(function (err, result) {
-        if (err) {
-          return d.reject(err);
-        }
-        // with 'spread' option: returns 'all' result with 'spread' only for multiple result
-        if (spread && arguments.length > 2) {
-          return d.resolve(apslice.call(arguments, 1));
-        }
-        // without 'spread' option: returns the 'first' result only and ignores following result
-        return d.resolve(result);
+
+      return promiseProvider.makePromise(function (resolve, reject) {
+          args.push(function (err, result) {
+            if (err) {
+              return reject(err);
+            }
+            // with 'spread' option: returns 'all' result with 'spread' only for multiple result
+            if (spread && arguments.length > 2) {
+              return resolve(apslice.call(arguments, 1));
+            }
+            // without 'spread' option: returns the 'first' result only and ignores following result
+            return resolve(result);
+          });
+          // fix https://github.com/iolo/mongoose-q/issues/1
+          // mongoose patches some instance methods after instantiation. :(
+          that[funcName].apply(that, args);
       });
-      // fix https://github.com/iolo/mongoose-q/issues/1
-      // mongoose patches some instance methods after instantiation. :(
-      this[funcName].apply(this, args);
-      return d.promise;
     };
   });
 }
@@ -93,15 +92,16 @@ function mongooseQ(mongoose, options) {
   // avoid duplicated application for custom mapper function...
   var applied = require('crypto').createHash('md5').update(mapper.toString()).digest('hex');
   if (mongoose['__q_applied_' + applied]) {
+    DEBUG && console.log("Mongoose-Q has already been applied", applied);
     return mongoose;
   }
 
-  qualify(mongoose.Model, MONGOOSE_MODEL_STATICS, mapper, spread);
-  qualify(mongoose.Model.prototype, MONGOOSE_MODEL_METHODS, mapper, spread);
-  qualify(mongoose.Query.prototype, MONGOOSE_QUERY_METHODS, mapper, spread);
-
+  DEBUG && console.log("Applying Mongoose-Q Functions", applied);
+  var promiseProvider = options.promiseProvider || new QPromiseProvider();
+  qualify(mongoose.Model, MONGOOSE_MODEL_STATICS, mapper, spread, promiseProvider);
+  qualify(mongoose.Model.prototype, MONGOOSE_MODEL_METHODS, mapper, spread, promiseProvider);
+  qualify(mongoose.Query.prototype, MONGOOSE_QUERY_METHODS, mapper, spread, promiseProvider);
   //qualify(Aggregate.prototype, AGGREGATE_METHODS, mapper, spread);
-
   mongoose['__q_applied_' + applied] = true;
   return mongoose;
 }
