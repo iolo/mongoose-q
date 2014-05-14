@@ -1,1 +1,1 @@
-module.exports = require('./libs/mongoose_q');
+module.exports = require('./lib/mongoose_q');
