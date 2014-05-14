@@ -21,7 +21,8 @@
     "grunt": "latest",
     "grunt-contrib-jshint": "latest",
     "grunt-contrib-nodeunit": "latest",
-    "bluebird": "^1.2.4"
+    "bluebird": "^1.2.4",
+    "when": "^3.1.0"
   },
   "directories": {
     "lib": "./lib"
