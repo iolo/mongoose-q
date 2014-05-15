@@ -1,7 +1,7 @@
 mongoose-q
 ==========
 
-[kriskowal's Q](http://documentup.com/kriskowal/q/) support for [mongoose](http://mongoosejs.com).
+Promise support for [mongoose](http://mongoosejs.com). Originally designed for [kriskowal's Q](http://documentup.com/kriskowal/q/).
 
 for [mongodb native nodejs driver](http://mongodb.github.io/node-mongodb-native/), see [mongo-q](http://github.com/iolo/mongo-q).
 

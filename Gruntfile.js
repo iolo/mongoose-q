@@ -4,15 +4,19 @@ module.exports = function (grunt) {
     jshint: {
       options: {
         devel: true,
-        node: true
+        node: true,
+        expr: true
       },
-      all: ['libs/**/*.js']
+      all: ['libs/**/*.js', 'tests/**/*.js']
     },
     nodeunit: {
-      all: ['tests/**/*_test.js']
+      all: ['tests/**/*_test.js'],
+      options: {
+          reporter: 'grunt'
+      }
     }
   });
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
-  grunt.registerTask('default', ['jshint']);
+  grunt.registerTask('default', ['jshint', 'nodeunit']);
 };
