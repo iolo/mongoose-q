@@ -22,9 +22,9 @@ var
     'find', 'exec', 'findOne', 'count', 'distinct', 'update', 'remove',
     'findOneAndUpdate', 'findOneAndRemove', 'lean', 'limit', 'skip', 'sort'
   ],
-  //MONGOOSE_AGGREGATE_METHODS = [
-  //  'exec'
-  //],
+  MONGOOSE_AGGREGATE_METHODS = [
+    'exec'
+  ],
   apslice = Array.prototype.slice,
   DEBUG = !!process.env.MONGOOSEQ_DEBUG;
 
@@ -100,7 +100,16 @@ function mongooseQ(mongoose, options) {
   qualify(mongoose.Model.prototype, MONGOOSE_MODEL_METHODS, mapper, spread);
   qualify(mongoose.Query.prototype, MONGOOSE_QUERY_METHODS, mapper, spread);
 
-  //qualify(Aggregate.prototype, AGGREGATE_METHODS, mapper, spread);
+  // XXX: simple but ugly workaround to access Aggregate prototype.
+  // see https://github.com/iolo/mongoose-q/issues/6 and
+  // https://github.com/LearnBoost/mongoose/issues/1910
+  try {
+      qualify(require(__dirname + '/../node_modules/mongoose/lib/aggregate').prototype,
+          MONGOOSE_AGGREGATE_METHODS, mapper, spread);
+  } catch (e) {
+      // ignore!
+      console.error(e);
+  }
 
   mongoose['__q_applied_' + applied] = true;
   return mongoose;

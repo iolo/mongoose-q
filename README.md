@@ -48,6 +48,15 @@ SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...)
   .done();
 ```
 
+* use Q-applied `aggregate` methods:
+```javascript
+SomeModel.aggregate(...).project(...).group(...).match(...).skip(...).limit(...).sort(...).unwind(...)
+  .execQ() // no 'Q' suffix for model statics except for execQ()
+  .then(function (result) { ... })
+  .fail(function (err) { ... })
+  .done();
+```
+
 * to apply Q with custom `suffix`/`prefix`:
 
 ```javascript

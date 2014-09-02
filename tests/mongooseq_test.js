@@ -200,5 +200,19 @@ module.exports = {
         test.ifError(err);
       })
       .done(test.done);
+  },
+  test_aggregate: function (test) {
+      UserModel.aggregate()
+        .match({name: {$regex: '^b.*' }})
+        .qExec()
+        .then(function (result) {
+          console.log('result:', result);
+          test.ok(result);
+        })
+        .fail(function (err) {
+          console.log(err);
+          test.ifError(err);
+        })
+        .done(test.done);
   }
 };
