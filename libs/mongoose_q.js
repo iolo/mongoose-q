@@ -103,12 +103,23 @@ function mongooseQ(mongoose, options) {
   // XXX: simple but ugly workaround to access Aggregate prototype.
   // see https://github.com/iolo/mongoose-q/issues/6 and
   // https://github.com/LearnBoost/mongoose/issues/1910
+  var Aggregate;
   try {
-      qualify(require(__dirname + '/../node_modules/mongoose/lib/aggregate').prototype,
-          MONGOOSE_AGGREGATE_METHODS, mapper, spread);
+    // outside of mongoose-q
+    // https://github.com/iolo/mongoose-q/issues/16
+    Aggregate = require(__dirname + '/../../mongoose/lib/aggregate');
   } catch (e) {
+    console.error('***ignore*** failed to load Aggregate', e);
+    try {
+      // inside of mongoose-q itself...
+      Aggregate = require(__dirname + '/../node_modules/mongoose/lib/aggregate');
+    } catch (e) {
       // ignore!
-      console.error(e);
+      console.error('***ignore*** failed to load Aggregate', e);
+    }
+  }
+  if (Aggregate && Aggregate.prototype) {
+    qualify(Aggregate.prototype, MONGOOSE_AGGREGATE_METHODS, mapper, spread);
   }
 
   mongoose['__q_applied_' + applied] = true;
