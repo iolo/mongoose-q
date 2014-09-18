@@ -24,7 +24,7 @@ var mongoose = require('mongoose-q')();
 ```javascript
 SomeModel.findByIdQ(....blahblah...)
   .then(function (result) { ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 ```
 
@@ -34,7 +34,7 @@ SomeModel.findByIdQ(....blahblah...)
 var someModel = new SomeModel(...);
 someModel.populateQ()
   .then(function (result) { ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 ```
 
@@ -44,7 +44,7 @@ someModel.populateQ()
 SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...)
   .execQ() // no 'Q' suffix for model statics except for execQ()
   .then(function (result) { ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 ```
 
@@ -53,7 +53,7 @@ SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...)
 SomeModel.aggregate(...).project(...).group(...).match(...).skip(...).limit(...).sort(...).unwind(...)
   .execQ() // no 'Q' suffix for model statics except for execQ()
   .then(function (result) { ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 ```
 
@@ -63,7 +63,7 @@ SomeModel.aggregate(...).project(...).group(...).match(...).skip(...).limit(...)
 var mongoose = require('mongoose-q')(require('mongoose'), {prefix:'promiseOf_', suffix:'_withQ'});
 SomeModel.promiseOf_findAndUpdate_withQ(...)
   .then(function (result) { ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 ```
 
@@ -76,7 +76,7 @@ function customMapper(name) {
 var mongoose = require('mongoose-q')(require('mongoose'), {mapper:customMapper});
 SomeModel.qFindAndUpdate(...)
   .then(function (result) { ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 ```
 
@@ -86,23 +86,23 @@ SomeModel.qFindAndUpdate(...)
 var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
 SomeModel.updateQ(...)
   .spread(function (affectedRows, raw) { ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 SomeModel.updateQ(...)
   .then(function (result) { var affectedRows = result[0], raw = result[1]; ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 ...
 var model = new SomeModel();
 ...
 model.saveQ()
   .spread(function (savedDoc, affectedRows) { ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 ...
 model.saveQ()
   .then(function (result) { var savedDoc = result[0], affectedRows = result[1]; ... })
-  .fail(function (err) { ... })
+  .catch(function (err) { ... })
   .done();
 ```
 > NOTE: without `spread` option(by default), you can access only the first result with `then`!!

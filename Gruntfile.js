@@ -6,13 +6,14 @@ module.exports = function (grunt) {
         devel: true,
         node: true
       },
-      all: ['libs/**/*.js']
+      all: ['*.js']
     },
-    nodeunit: {
+    mochaTest: {
       all: ['tests/**/*_test.js']
     }
   });
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
+  grunt.loadNpmTasks('grunt-mocha-test');
   grunt.registerTask('default', ['jshint']);
+  grunt.registerTask('test', ['mochaTest']);
 };
