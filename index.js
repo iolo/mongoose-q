@@ -76,7 +76,7 @@ function qualify(obj, funcNames, funcNameMapper, spread) {
  * @param {mongoose.Mongoose} [mongoose]
  * @param {object.<string,*>} [options={}] - prefix and/or suffix for wrappers
  * @param {string} [options.prefix='']
- * @param {string} [options.suffix='']
+ * @param {string} [options.suffix='Q']
  * @param {function(string):string} [options.mapper]
  * @param {boolean} [options.spread=false]
  * @returns {mongoose.Mongoose} the same mongoose instance, for convenince
