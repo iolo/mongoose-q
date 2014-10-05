@@ -6,7 +6,8 @@ var
     customMapper = function (name) {
         return 'q' + name.charAt(0).toUpperCase() + name.substring(1);
     },
-    mongoose = require('../index')(require('mongoose'), {spread: true, mapper: customMapper}),
+    // NOTE: without spread option!
+    mongoose = require('../index')(require('mongoose'), {mapper: customMapper}),
     Schema = mongoose.Schema,
     UserSchema = new Schema({
         name: String
@@ -121,31 +122,22 @@ describe('mongooseq', function () {
     });
     it('should create', function (done) {
         UserModel.qCreate({name: 'hello'}, {name: 'world'})
-            .then(function (createdUsers) {
-                debug('created users:', arguments);
-                assert.equal(createdUsers.length, 2);
-                assert.equal(createdUsers[0].name, 'hello');
-                assert.equal(createdUsers[1].name, 'world');
+            .then(function (createdUser1, createdUser2) {
+                debug('Model.create:', arguments);
+                assert.equal(createdUser1.name, 'hello');
+                // NOTE: you couldn't get remaing result without 'spread' option!
+                assert.ok(typeof createdUser2 === 'undefined');
             })
             .catch(assert.ifError)
             .done(done);
     });
-    it('should create with spread', function (done) {
-        UserModel.qCreate({name: 'hello spread'}, {name: 'world spread'})
-            .spread(function (createdUser1, createdUser2) {
-                debug('created users:', arguments);
-                assert.equal(createdUser1.name, 'hello spread');
-                assert.equal(createdUser2.name, 'world spread');
-            })
-            .catch(assert.ifError)
-            .done(done);
-    });
-    it('should update with spread', function (done) {
+    it('should update', function (done) {
         PostModel.qUpdate({_id: fixtures.posts.p1._id}, { title: 'changed'})
-            .spread(function (affectedRows, raw) {
-                debug('Model.update-->', arguments);
+            .then(function (affectedRows, raw) {
+                debug('Model.update:', arguments);
                 assert.equal(affectedRows, 1);
-                assert.ok(raw);
+                // NOTE: you couldn't get remaing result without 'spread' option!
+                assert.ok(typeof raw === 'undefined');
             })
             .catch(assert.ifError)
             .done(done);
@@ -158,14 +150,15 @@ describe('mongooseq', function () {
         post.author = fixtures.users.u1._id;
         assert.ok(post.isNew);
         post.qSave()
-            .spread(function (result, affectedRows) {// with 'spread' options
+            .then(function (result, affectedRows) {
                 debug('Model#save-->', arguments);
                 assert.ok(result);
-                assert.equal(affectedRows, 1);
                 assert.ok(!result.isNew);
                 assert.ok(result._id);
                 assert.equal(result.title, 'new-title');
                 assert.equal(result.author.toString(), fixtures.users.u1._id.toString());
+                // NOTE: you couldn't get remaing result without 'spread' option!
+                assert.ok(typeof affectedRows === 'undefined');
             })
             .catch(assert.ifError)
             .done(function () {
