@@ -2,29 +2,6 @@
 
 var
   Q = require('q'),
-  MONGOOSE_MODEL_STATICS = [
-    // mongoose.Model static
-    'remove', 'ensureIndexes', 'find', 'findById', 'findOne', 'count', 'distinct',
-    'findOneAndUpdate', 'findByIdAndUpdate', 'findOneAndRemove', 'findByIdAndRemove',
-    'create', 'update', 'mapReduce', 'aggregate', 'populate',
-    'geoNear', 'geoSearch',
-    // mongoose.Document static
-    'update'
-  ],
-  MONGOOSE_MODEL_METHODS = [
-    // mongoose.Model instance
-    'save', 'remove',
-    // mongoose.Document instance
-    'populate', 'update', 'validate'
-  ],
-  MONGOOSE_QUERY_METHODS = [
-    // mongoose.Query instance
-    'find', 'exec', 'findOne', 'count', 'distinct', 'update', 'remove',
-    'findOneAndUpdate', 'findOneAndRemove', 'lean', 'limit', 'skip', 'sort'
-  ],
-  MONGOOSE_AGGREGATE_METHODS = [
-    'exec'
-  ],
   apslice = Array.prototype.slice,
   debug = console.log.bind(console),
   DEBUG = !!process.env.MONGOOSEQ_DEBUG;
@@ -79,6 +56,7 @@ function qualify(obj, funcNames, funcNameMapper, spread) {
  * @param {string} [options.suffix='Q']
  * @param {function(string):string} [options.mapper]
  * @param {boolean} [options.spread=false]
+ * @param {object.<string,array<string>>} [options.funcNames=false]
  * @returns {mongoose.Mongoose} the same mongoose instance, for convenince
  */
 function mongooseQ(mongoose, options) {
@@ -90,20 +68,21 @@ function mongooseQ(mongoose, options) {
     return prefix + funcName + suffix;
   };
   var spread = options.spread;
+  var funcNames = options.funcNames || require('./func_names');
   // avoid duplicated application for custom mapper function...
-  var applied = require('crypto').createHash('md5').update(mapper.toString()).digest('hex');
+  var applied = require('crypto').createHash('md5').update(prefix+suffix+mapper+spread).digest('hex');
   if (mongoose['__q_applied_' + applied]) {
     return mongoose;
   }
 
-  qualify(mongoose.Model, MONGOOSE_MODEL_STATICS, mapper, spread);
-  qualify(mongoose.Model.prototype, MONGOOSE_MODEL_METHODS, mapper, spread);
-  qualify(mongoose.Query.prototype, MONGOOSE_QUERY_METHODS, mapper, spread);
+  qualify(mongoose.Model, funcNames.MODEL_STATICS, mapper, spread);
+  qualify(mongoose.Model.prototype, funcNames.MODEL_METHODS, mapper, spread);
+  qualify(mongoose.Query.prototype, funcNames.QUERY_METHODS, mapper, spread);
 
   // see https://github.com/iolo/mongoose-q/issues/6 and
   // https://github.com/LearnBoost/mongoose/issues/1910
   var Aggregate = require('mongoose/lib/aggregate');
-  qualify(Aggregate.prototype, MONGOOSE_AGGREGATE_METHODS, mapper, spread);
+  qualify(Aggregate.prototype, funcNames.AGGREGATE_METHODS, mapper, spread);
 
   mongoose['__q_applied_' + applied] = true;
   return mongoose;
