@@ -1,8 +1,14 @@
 mongoose-q
 ==========
 
->![WANTED](http://web.redding.com/images/misc/wanted-responsive.png)
->***WANTED: looking for new maintainer or contributor***
+>
+> ![WANTED](http://web.redding.com/images/misc/wanted-responsive.png)
+>
+> ***WANTED: looking for new maintainer or contributor***
+>
+> please contact me via [email](mailto:iolothebard at gmail dot com) or [twitter](http://twitter.com/iolothebard)
+>
+
 
 [kriskowal's Q](http://documentup.com/kriskowal/q/) support for [mongoose](http://mongoosejs.com).
 
