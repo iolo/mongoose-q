@@ -1,6 +1,6 @@
 // try this too
 // var mongoose = require('./index')();
-var mongoose = require('./index')(require('mongoose'),{spread:true});
+var mongoose = require('..')(require('mongoose'),{spread:true});
 
 mongoose.connect('mongodb://localhost/test');
 

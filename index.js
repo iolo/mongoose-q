@@ -1,7 +1,6 @@
 'use strict';
 
 var
-  Q = require('q'),
   apslice = Array.prototype.slice,
   debug = console.log.bind(console),
   DEBUG = !!process.env.MONGOOSEQ_DEBUG;
@@ -17,7 +16,7 @@ var
  * @param {function(string):string} funcNameMapper maps a function name into Q-applied one
  * @param {*} [spread=false] use spread for multi-results
  */
-function qualify(obj, funcNames, funcNameMapper, spread) {
+function qualify(qLib, obj, funcNames, funcNameMapper, spread) {
   funcNames.forEach(function (funcName) {
     if (typeof(obj[funcName]) !== 'function') {
       DEBUG && debug('***skip*** function not found:', funcName);
@@ -26,7 +25,7 @@ function qualify(obj, funcNames, funcNameMapper, spread) {
     var mappedFuncName = funcNameMapper(funcName);
     DEBUG && debug('wrap function:', funcName, '-->', mappedFuncName);
     obj[mappedFuncName] = function () {
-      var d = Q.defer();
+      var d = qLib.defer();
       var args = apslice.call(arguments);
       args.push(function (err, result) {
         if (err) {
@@ -67,6 +66,8 @@ function mongooseQ(mongoose, options) {
   var mapper = options.mapper || function (funcName) {
     return prefix + funcName + suffix;
   };
+  var qLib = options.q || require('q');
+
   var spread = options.spread;
   var funcNames = options.funcNames || require('./func_names');
   // avoid duplicated application for custom mapper function...
@@ -75,14 +76,14 @@ function mongooseQ(mongoose, options) {
     return mongoose;
   }
 
-  qualify(mongoose.Model, funcNames.MODEL_STATICS, mapper, spread);
-  qualify(mongoose.Model.prototype, funcNames.MODEL_METHODS, mapper, spread);
-  qualify(mongoose.Query.prototype, funcNames.QUERY_METHODS, mapper, spread);
+  qualify(qLib, mongoose.Model, funcNames.MODEL_STATICS, mapper, spread);
+  qualify(qLib, mongoose.Model.prototype, funcNames.MODEL_METHODS, mapper, spread);
+  qualify(qLib, mongoose.Query.prototype, funcNames.QUERY_METHODS, mapper, spread);
 
   // see https://github.com/iolo/mongoose-q/issues/6 and
   // https://github.com/LearnBoost/mongoose/issues/1910
   var Aggregate = require('mongoose/lib/aggregate');
-  qualify(Aggregate.prototype, funcNames.AGGREGATE_METHODS, mapper, spread);
+  qualify(qLib, Aggregate.prototype, funcNames.AGGREGATE_METHODS, mapper, spread);
 
   mongoose['__q_applied_' + applied] = true;
   return mongoose;

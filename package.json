@@ -22,5 +22,8 @@
     "grunt": "latest",
     "grunt-contrib-jshint": "latest",
     "grunt-mocha-test": "latest"
+  },
+  "scripts": {
+    "test": "mocha tests/*_test.js"
   }
 }
