@@ -127,7 +127,6 @@ describe('mongooseq', function () {
     it('should aggregate', function (done) {
         // fix issue6
         var agg = UserModel.aggregate();
-        console.log('****************', agg);
         agg
             .match({name: {$regex: '^b.*' }})
             .qExec()
