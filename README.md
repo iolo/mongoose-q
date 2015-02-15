@@ -28,6 +28,12 @@ var mongoose = require('mongoose'),
 var mongoose = require('mongoose-q')();
 ```
 
+### to apply another Q implementation(since v0.0.15):
+
+```javascript
+var mongoose = require('mongoose-q')(require('mongoose'), {q:require('q-bluebird')});
+```
+
 ### use Q-applied `model` statics:
 
 ```javascript
