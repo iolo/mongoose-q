@@ -65,6 +65,8 @@ describe('mongooseq', function () {
             .then(function (result) {
                 debug('Model#populate-->', result);
                 assert.ok(result);
+                assert.ok(result.author._id);
+                assert.ok(result.author.name);
             })
             .catch(assert.ifError)
             .done(done);
@@ -147,6 +149,30 @@ describe('mongooseq', function () {
                 debug('users:', users);
                 assert.ok(user);
                 assert.ok(users);
+            })
+            .catch(assert.ifError)
+            .done(done);
+    });
+    it('should assert issue22', function (done) {
+        PostModel.qFindById(fixtures.posts.p1._id)
+            .then(function (result) {
+                debug('Model.findById-->', result);
+                assert.ok(result);
+                return result.qPopulate([
+                    {path:'author'},
+                    {path:'comments.author'}
+                ]);
+            })
+            .then(function (result) {
+                debug('Model#populate author-->', result.author);
+                assert.ok(result);
+                assert.ok(result.author._id);
+                assert.ok(result.author.name);
+                result.comments.forEach(function (comment) {
+                    debug('Model#populate comments.author-->', comment.author);
+                    assert.ok(comment.author._id);
+                    assert.ok(comment.author.name);
+                });
             })
             .catch(assert.ifError)
             .done(done);

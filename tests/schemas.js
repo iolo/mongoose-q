@@ -8,7 +8,11 @@ var
     }),
     PostSchema = new Schema({
         title: String,
-        author: {type: Schema.Types.ObjectId, ref: 'User'}
+        author: {type: Schema.Types.ObjectId, ref: 'User'},
+        comments: [{
+            content: String,
+            author: {type: Schema.Types.ObjectId, ref: 'User'}
+        }]
     }),
     debug = require('debug')('test');
 
