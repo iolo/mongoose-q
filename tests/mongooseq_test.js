@@ -91,13 +91,14 @@ describe('mongooseq', function () {
             .catch(assert.ifError)
             .done(done);
     });
+    // NOTE: since mongoose 4.x: update only returns a result - raw mongo result.
     it('should update', function (done) {
         PostModel.qUpdate({_id: fixtures.posts.p1._id}, { title: 'changed'})
-            .then(function (affectedRows, raw) {
+            .then(function (raw) {
                 debug('Model.update:', arguments);
-                assert.equal(affectedRows, 1);
-                // NOTE: you couldn't get remaing result without 'spread' option!
-                assert.ok(typeof raw === 'undefined');
+                assert.ok(raw);
+                assert.equal(raw.ok, 1);
+                assert.equal(raw.nModified, 1);
             })
             .catch(assert.ifError)
             .done(done);
@@ -117,7 +118,7 @@ describe('mongooseq', function () {
                 assert.ok(result._id);
                 assert.equal(result.title, 'new-title');
                 assert.equal(result.author.toString(), fixtures.users.u1._id.toString());
-                // NOTE: you couldn't get remaing result without 'spread' option!
+                // NOTE: you couldn't get remaining result without 'spread' option!
                 assert.ok(typeof affectedRows === 'undefined');
             })
             .catch(assert.ifError)

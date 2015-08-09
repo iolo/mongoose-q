@@ -31,6 +31,7 @@ var mongoose = require('mongoose-q')();
 ### to apply another Q implementation(since v0.0.15):
 
 ```javascript
+// to use bluebird
 var mongoose = require('mongoose-q')(require('mongoose'), {q:require('q-bluebird')});
 ```
 
@@ -57,7 +58,7 @@ someModel.populateQ()
 
 ```javascript
 SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...)
-  .execQ() // no 'Q' suffix for model statics except for execQ()
+  .execQ() // no 'Q' suffix for Query methods except for execQ()
   .then(function (result) { ... })
   .catch(function (err) { ... })
   .done();
@@ -67,7 +68,7 @@ SomeModel.find(...).where(...).skip(...).limit(...).sort(...).populate(...)
 
 ```javascript
 SomeModel.aggregate(...).project(...).group(...).match(...).skip(...).limit(...).sort(...).unwind(...)
-  .execQ() // no 'Q' suffix for model statics except for execQ()
+  .execQ() // no 'Q' suffix for Aggregate methods except for execQ()
   .then(function (result) { ... })
   .catch(function (err) { ... })
   .done();
@@ -96,16 +97,20 @@ SomeModel.qFindAndUpdate(...)
   .done();
 ```
 
-### to apply Q with `spread`:
+### **DEPRECATED** to apply Q with `spread`:
+
+> NOTE: since mongoose 4.x: no spread for update()!
+
+> NOTE: without `spread` option(by default), you can access only the first result with `then`!!
 
 ```javascript
 var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
-SomeModel.updateQ(...)
-  .spread(function (affectedRows, raw) { ... })
+SomeModel.createQ(doc1, doc2, ...)
+  .spread(function (saved1, saved2, ...) { ... })
   .catch(function (err) { ... })
   .done();
-SomeModel.updateQ(...)
-  .then(function (result) { var affectedRows = result[0], raw = result[1]; ... })
+SomeModel.createQ(doc1, doc2, ...)
+  .then(function (result) { var saved1 = result[0], raw = saved1[1]; ... })
   .catch(function (err) { ... })
   .done();
 ...
@@ -121,9 +126,10 @@ model.saveQ()
   .catch(function (err) { ... })
   .done();
 ```
-> NOTE: without `spread` option(by default), you can access only the first result with `then`!!
 
 ### to define custom statics/instance methods using Q
+
+> NOTE: this is not a feature of mongoose-q
 
 ```javascript
 SomeSchema.statics.findByName = function (name) {
@@ -135,6 +141,5 @@ SomeModel.findByName('foo').then(function(result) {
   console.log(result);
 });
 ```
-> NOTE: this is not a feature of mongoose-q
 
 That's all folks!

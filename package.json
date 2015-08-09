@@ -1,6 +1,6 @@
 {
   "name": "mongoose-q",
-  "version": "0.0.17",
+  "version": "0.1.0",
   "description": "kriskowal's Q support for mongoose",
   "author": "Dongsu Jang <iolothebard@gmail.com>",
   "repository": {
@@ -9,22 +9,22 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=0.10",
-    "iojs": ">=1.0"
+    "node": ">=0.12",
+    "iojs": ">=2.0",
+    "npm": ">=2.0"
   },
   "dependencies": {
-    "q": "~1.0.1",
-    "mongoose": ">=3.8.25"
+    "q": ">=1.4.1",
+    "mongoose": ">=4.1.1"
   },
   "devDependencies": {
     "debug": "latest",
+    "gulp": "latest",
+    "gulp-doxx": "latest",
+    "gulp-jshint": "latest",
+    "gulp-mocha": "latest",
+    "gulp-util": "latest",
     "mocha": "latest",
-    "pow-mongodb-fixtures": "latest",
-    "grunt": "latest",
-    "grunt-contrib-jshint": "latest",
-    "grunt-mocha-test": "latest"
-  },
-  "scripts": {
-    "test": "mocha tests/*_test.js"
+    "pow-mongodb-fixtures": "latest"
   }
 }

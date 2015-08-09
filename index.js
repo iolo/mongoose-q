@@ -51,12 +51,13 @@ function qualify(qLib, obj, funcNames, funcNameMapper, spread) {
  *
  * @param {mongoose.Mongoose} [mongoose]
  * @param {object.<string,*>} [options={}] - prefix and/or suffix for wrappers
+ * @param {object} [options.q] promise implementation(default: kriskowal's Q)
  * @param {string} [options.prefix='']
  * @param {string} [options.suffix='Q']
  * @param {function(string):string} [options.mapper]
- * @param {boolean} [options.spread=false]
+ * @param {boolean} [options.spread=false] **DEPRECATED**
  * @param {object.<string,array<string>>} [options.funcNames=false]
- * @returns {mongoose.Mongoose} the same mongoose instance, for convenince
+ * @returns {mongoose.Mongoose} the same mongoose instance, for convenience
  */
 function mongooseQ(mongoose, options) {
   mongoose = mongoose || require('mongoose');
@@ -79,11 +80,7 @@ function mongooseQ(mongoose, options) {
   qualify(qLib, mongoose.Model, funcNames.MODEL_STATICS, mapper, spread);
   qualify(qLib, mongoose.Model.prototype, funcNames.MODEL_METHODS, mapper, spread);
   qualify(qLib, mongoose.Query.prototype, funcNames.QUERY_METHODS, mapper, spread);
-
-  // see https://github.com/iolo/mongoose-q/issues/6 and
-  // https://github.com/LearnBoost/mongoose/issues/1910
-  var Aggregate = require('mongoose/lib/aggregate');
-  qualify(qLib, Aggregate.prototype, funcNames.AGGREGATE_METHODS, mapper, spread);
+  qualify(qLib, mongoose.Aggregate.prototype, funcNames.AGGREGATE_METHODS, mapper, spread);
 
   mongoose['__q_applied_' + applied] = true;
   return mongoose;
